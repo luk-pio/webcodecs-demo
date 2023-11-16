@@ -2,26 +2,26 @@ import { errorHandler } from "./error.js";
 import { displayVideoStream, initializeVideoStream } from "./video-stream.js";
 
 function setBlackBackground() {
-  document.body.style.backgroundColor = "black"
+    document.body.style.backgroundColor = "black"
 }
 
 function setWhiteBackground() {
-  document.body.style.backgroundColor = "white"
+    document.body.style.backgroundColor = "white"
 }
 
 const captureConfig = {
-  pattern: "01",
-  duration: 10 ** 3,
-  handlers: { '0': setBlackBackground, '1': setWhiteBackground }
+    pattern: "01",
+    duration: 10 ** 3,
+    handlers: { '0': setBlackBackground, '1': setWhiteBackground }
 }
 
 export async function startCapture() {
-  const { videoStream, videoStreamTrack, videoStreamTrackSettings } = await initializeVideoStream()
-  displayVideoStream(videoStream)
-  const trackProcessor = getTrackProcessor(videoStreamTrack)
-  const videoFrameStream = getFrameStream(trackProcessor)
-  const videoWorker = new Worker('./js/video-worker.js');
-  videoWorker.onerror = errorHandler
+    const { videoStream, videoStreamTrack, videoStreamTrackSettings } = await initializeVideoStream()
+    displayVideoStream(videoStream)
+    const trackProcessor = getTrackProcessor(videoStreamTrack)
+    const videoFrameStream = getFrameStream(trackProcessor)
+    const videoWorker = new Worker('./js/video-worker.js');
+    videoWorker.onerror = errorHandler
     videoWorker.postMessage({
         type: 'captureStart',
         videoFrameStream,
@@ -36,22 +36,22 @@ export async function startCapture() {
 }
 
 function getTrackProcessor(track) {
-  return new MediaStreamTrackProcessor(track)
+    return new MediaStreamTrackProcessor(track)
 }
 
 function getFrameStream(trackProcessor) {
-  return trackProcessor.readable
+    return trackProcessor.readable
 }
 
 async function workerReady(worker) {
     return new Promise((resolve, reject) => {
-        worker.onmessage = function(event) {
+        worker.onmessage = function (event) {
             if (event.data.type === 'ready') {
                 resolve(true);
             }
         };
 
-        worker.onerror = function(error) {
+        worker.onerror = function (error) {
             reject(error);
         };
     });
@@ -83,5 +83,7 @@ async function wait(duration) {
 function validateHandlers(handlers, pattern) {
     const patternChars = new Set(pattern.split(""));
     const missingHandlers = [...patternChars].filter(char => !(char in handlers))
-    if (missingHandlers.length) { throw new Error(`Missing handlers for characters: ${missingHandlers}`) }
+    if (missingHandlers.length) {
+        throw new Error(`Missing handlers for characters: ${missingHandlers}`)
+    }
 }
