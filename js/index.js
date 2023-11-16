@@ -1,3 +1,6 @@
+import { startCapture } from "./capture.js";
+import { displayError, unhandledRejectionHandler, errorHandler } from "./error.js";
+
 addEventListener("load", main);
 addEventListener("unhandledrejection", unhandledRejectionHandler);
 addEventListener("error", errorHandler);
@@ -7,6 +10,8 @@ async function main() {
     displayError("Your browser must support WebCodecs to use this page. Please use one of the supported browsers https://caniuse.com/webcodecs");
     return
   }
+  const captureButton = document.getElementById('capture-button')
+  captureButton.onclick = startCapture
 }
 
 function checkWebcodecSupport() {
