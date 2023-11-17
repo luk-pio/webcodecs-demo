@@ -1,4 +1,4 @@
-import { startCapture } from "./capture.js";
+import { capture } from "./capture.js";
 import { displayError, unhandledRejectionHandler, errorHandler } from "./error.js";
 
 addEventListener("load", main);
@@ -11,7 +11,7 @@ async function main() {
     return
   }
   const captureButton = document.getElementById('capture-button')
-  captureButton.onclick = startCapture
+  captureButton.onclick = capture
 }
 
 function checkWebcodecSupport() {

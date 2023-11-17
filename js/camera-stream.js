@@ -1,21 +1,45 @@
-export async function initializeVideoStream() {
+export class CameraStream {
+    constructor(device) {
+        this.device = device
+    }
+
+    async startCameraStream(navigator) {
+        const { videoStream, videoStreamTrack } = await initializeVideoStream(navigator, this.device);
+        this.videoStream = videoStream
+        this.videoStreamTrack = videoStreamTrack
+        return videoStreamTrack
+    }
+
+    get videoStreamTrackSettings() {
+        return this.videoStreamTrack.getSettings()
+    }
+
+    async stopCameraStream() {
+        this.videoStreamTrack.stop()
+    }
+}
+
+export async function getCameraDevice(navigator) {
   const mediaDevices = getMediaDevices(navigator)
   const devices = await getVideoDevices(mediaDevices)
   const device = getBestDevice(devices)
-  const videoStream = await getVideoStream(mediaDevices, device)
-  const videoStreamTrack = await getVideoStreamTrack(videoStream)
-  const videoStreamTrackSettings = videoStreamTrack.getSettings()
-  return { videoStream, videoStreamTrack, videoStreamTrackSettings }
-}
-
-export function displayVideoStream(videoStream) {
-  const videoElement = document.getElementById('src');
-  videoElement.srcObject = videoStream;
+  return device
 }
 
 function getMediaDevices(navigator) {
   const mediaDevices = navigator?.mediaDevices
   return mediaDevices
+}
+
+export async function initializeVideoStream(navigator, device) {
+  const videoStream = await getVideoStream(navigator, device)
+  const videoStreamTrack = await getVideoStreamTrack(videoStream)
+  return { videoStream, videoStreamTrack }
+}
+
+export function displayVideoStream(videoStream) {
+  const videoElement = document.getElementById('src');
+  videoElement.srcObject = videoStream;
 }
 
 async function getVideoDevices(mediaDevices) {
@@ -46,7 +70,7 @@ async function getVideoStreamTrack(stream) {
   return track
 }
 
-async function getVideoStream(mediaDevices, device) {
-  const stream = await mediaDevices.getUserMedia({ video: device });
+async function getVideoStream(navigator, device) {
+  const stream = await navigator.mediaDevices.getUserMedia({ video: device });
   return stream;
 }

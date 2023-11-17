@@ -4,9 +4,9 @@ export function displayError(message) {
 }
 
 export function errorHandler(event) {
-    displayError(event.message)
+    displayError(event?.message)
 }
 
 export function unhandledRejectionHandler(event) {
-    displayError(event.message)
+    displayError(event?.reason)
 }
