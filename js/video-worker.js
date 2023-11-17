@@ -31,10 +31,11 @@ async function captureStart({ videoFrameStream, videoStreamTrackSettings }) {
   const { width, height } = videoStreamTrackSettings
 
   const encoderConfig = {
-    codec: "vp09.00.10.08",
+    codec: "vp8",
     width: width,
     height: height,
-    bitrate: 10e6,
+    bitrate: 2_000_000,
+    framerate: 30
   };
 
   const chunks = []
@@ -43,9 +44,9 @@ async function captureStart({ videoFrameStream, videoStreamTrackSettings }) {
 
   const init = {
     output: (chunk) => {
-      const array = new Uint8Array(chunk.byteLength)
-      chunk.copyTo(array)
-      chunks.push(array)
+      // const array = new Uint8Array(chunk.byteLength)
+      // chunk.copyTo(array)
+      chunks.push(chunk)
     },
     error: (error) => {
       reportError(error)

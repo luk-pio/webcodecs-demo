@@ -1,6 +1,7 @@
 import { getCameraDevice, CameraStream, displayVideoStream } from "./camera-stream.js"
 import { CameraWorker } from "./camera-worker.js"
 import { captureConfig } from "./config.js"
+import { decode } from "./decoder.js"
 
 export async function capture() {
     const cameraDevice = await getCameraDevice(navigator)
@@ -11,7 +12,8 @@ export async function capture() {
     const cameraWorker = new CameraWorker(cameraStream)
     await cameraWorker.startCameraWorker()
     await runFrameCapture(cameraWorker, captureConfig)
-    cameraWorker.stopCameraWorker()
+    const encodedChunks = await cameraWorker.stopCameraWorker();
+    decode(encodedChunks);
 }
 
 async function runFrameCapture(cameraWorker, { handlers, pattern, duration }) {

@@ -1,6 +1,8 @@
 import { errorHandler } from "./error.js";
 
 export class CameraWorker {
+    #encodedChunks;
+
     constructor(cameraStream) {
         this.cameraStream = cameraStream
     }
@@ -33,12 +35,13 @@ export class CameraWorker {
             type: 'captureStop'
         })
         const message = await receiveWorkerMessage(this.worker, 'finished')
-        this.encodedChunks = message.chunks
+        this.#encodedChunks = message.chunks
         this.cameraStream.stopCameraStream()
+        return this.#encodedChunks
     }
 
     get encodedChunks() {
-        return this.encodedChunks
+        return this.#encodedChunks
     }
 }
 
