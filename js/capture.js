@@ -1,27 +1,39 @@
 import { getCameraDevice, CameraStream, displayVideoStream } from "./camera-stream.js"
-import { CameraWorker } from "./camera-worker.js"
+import { FrameCaptureWorker } from "./frame-capture/frame-capture.js"
 import { captureConfig } from "./config.js"
 import { decode } from "./decoder.js"
 
 export async function capture() {
+    // Initialize the correct camera stream
     const cameraDevice = await getCameraDevice(navigator)
     const cameraStream = new CameraStream(cameraDevice)
+    await cameraStream.start(navigator)
 
-    await cameraStream.startCameraStream(navigator)
+    // Display the camera stream to the user
     displayVideoStream(cameraStream.videoStream)
-    const cameraWorker = new CameraWorker(cameraStream)
-    await cameraWorker.startCameraWorker()
-    await runFrameCapture(cameraWorker, captureConfig)
-    const encodedChunks = await cameraWorker.stopCameraWorker();
+
+    // Initialize the frame capture worker
+    const frameCaptureWorker = new FrameCaptureWorker(cameraStream)
+    await frameCaptureWorker.start()
+
+    // Run the frame capture
+    await runFrameCapture(frameCaptureWorker, captureConfig)
+
+    // stop the stream and get the encoded chunks
+    const workerResponse = await frameCaptureWorker.stop();
+    const encodedChunks = workerResponse.chunks;
+    await cameraStream.stop();
+
+    // Transfer the encoded chunks to the decoder
     decode(encodedChunks);
 }
 
-async function runFrameCapture(cameraWorker, { handlers, pattern, duration }) {
+async function runFrameCapture(worker, { handlers, pattern, duration }) {
     validateHandlers(handlers, pattern)
     const intervalDuration = duration / pattern.length
     for (const char of pattern) {
         runHandler(handlers, char)
-        cameraWorker.captureFrame()
+        worker.captureFrame()
         await wait(intervalDuration)
     }
 }
@@ -36,7 +48,7 @@ function validateHandlers(handlers, pattern) {
 
 function runHandler(handlers, char) {
     handlers[char]()
-    console.log("Fired handler for char: " + char)
+    console.log("Firing handler for char: " + char)
     console.log("At: " + performance.now())
 }
 

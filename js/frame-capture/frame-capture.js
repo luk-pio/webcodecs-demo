@@ -1,47 +1,43 @@
-import { errorHandler } from "./error.js";
+import { cameraConfig } from "../config.js";
+import { errorHandler } from "../error.js";
 
-export class CameraWorker {
-    #encodedChunks;
-
+export class FrameCaptureWorker {
     constructor(cameraStream) {
         this.cameraStream = cameraStream
     }
 
-    async initializeFrameCaptureWorker() {
+    async #initializeFrameCaptureWorker() {
         this.trackProcessor = getTrackProcessor(this.cameraStream.videoStreamTrack)
         this.videoFrameStream = getFrameStream(this.trackProcessor)
-        this.worker = new Worker('./js/video-worker.js');
+        this.worker = new Worker('./js/frame-capture/worker.js');
         this.worker.onerror = errorHandler
     }
 
-    async startCameraWorker() {
-        await this.initializeFrameCaptureWorker()
+    async start() {
+        await this.#initializeFrameCaptureWorker()
         this.worker.postMessage({
-            type: 'captureStart',
+            type: 'start',
             videoFrameStream: this.videoFrameStream,
-            videoStreamTrackSettings: this.cameraStream.videoStreamTrackSettings
+            videoStreamTrackSettings: this.cameraStream.videoStreamTrackSettings,
+            cameraConfig
         }, [this.videoFrameStream]);
         await receiveWorkerMessage(this.worker, 'ready')
     }
 
     async captureFrame() {
         this.worker.postMessage({
-            type: 'captureFrame'
+            type: 'capture'
         })
+        const message = await receiveWorkerMessage(this.worker, 'captured')
+        return message
     }
 
-    async stopCameraWorker() {
+    async stop() {
         this.worker.postMessage({
-            type: 'captureStop'
+            type: 'stop'
         })
         const message = await receiveWorkerMessage(this.worker, 'finished')
-        this.#encodedChunks = message.chunks
-        this.cameraStream.stopCameraStream()
-        return this.#encodedChunks
-    }
-
-    get encodedChunks() {
-        return this.#encodedChunks
+        return message
     }
 }
 

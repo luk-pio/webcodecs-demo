@@ -1,8 +1,7 @@
+import { cameraConfig } from "./config.js";
 export async function decode(encodedChunks) {
-    // Create a VideoDecoder
     const videoDecoder = new VideoDecoder({
         output: frame => {
-            // Handle the decoded frame
             renderFrame(frame);
             frame.close();
         },
@@ -11,7 +10,7 @@ export async function decode(encodedChunks) {
         }
     });
 
-    videoDecoder.configure({ codec: 'vp8' /* specify the appropriate codec */ });
+    videoDecoder.configure({ codec: cameraConfig.codec });
 
     // Decode the chunks
     encodedChunks.forEach(chunk => {
@@ -20,7 +19,6 @@ export async function decode(encodedChunks) {
 
     function renderFrame(frame) {
         // Create an OffscreenCanvas for rendering
-        debugger;
         const offscreenCanvas = new OffscreenCanvas(frame.codedWidth, frame.codedHeight);
         const ctx = offscreenCanvas.getContext('2d');
 

@@ -3,7 +3,7 @@ export class CameraStream {
         this.device = device
     }
 
-    async startCameraStream(navigator) {
+    async start(navigator) {
         const { videoStream, videoStreamTrack } = await initializeVideoStream(navigator, this.device);
         this.videoStream = videoStream
         this.videoStreamTrack = videoStreamTrack
@@ -14,7 +14,7 @@ export class CameraStream {
         return this.videoStreamTrack.getSettings()
     }
 
-    async stopCameraStream() {
+    async stop() {
         this.videoStreamTrack.stop()
     }
 }

@@ -11,13 +11,13 @@ self.addEventListener('error', function (event) {
 function main(event) {
   const type = event.data.type
   console.info("Worker received event: ", event.data)
-  if (type === "captureStart") {
+  if (type === "start") {
     captureStart(event.data)
   }
-  else if (type === "captureFrame") {
+  else if (type === "capture") {
     captureFrame(event.data)
   }
-  else if (type === "captureStop") {
+  else if (type === "stop") {
     captureStop(event.data)
   }
   else {
@@ -25,17 +25,17 @@ function main(event) {
   }
 }
 
-async function captureStart({ videoFrameStream, videoStreamTrackSettings }) {
+async function captureStart({ videoFrameStream, videoStreamTrackSettings, cameraConfig }) {
   let frameCounter = 0;
 
   const { width, height } = videoStreamTrackSettings
 
   const encoderConfig = {
-    codec: "vp8",
+    codec: cameraConfig.codec,
     width: width,
     height: height,
-    bitrate: 2_000_000,
-    framerate: 30
+    bitrate: cameraConfig.bitrate,
+    framerate: cameraConfig.frameRate
   };
 
   const chunks = []
@@ -44,8 +44,6 @@ async function captureStart({ videoFrameStream, videoStreamTrackSettings }) {
 
   const init = {
     output: (chunk) => {
-      // const array = new Uint8Array(chunk.byteLength)
-      // chunk.copyTo(array)
       chunks.push(chunk)
     },
     error: (error) => {
@@ -81,6 +79,7 @@ async function captureFrame() {
 
   encoder.encode(value, { keyFrame: true });
   await value.close();
+  postMessage({ type: "frameCaptured" })
 };
 
 async function captureStop() {

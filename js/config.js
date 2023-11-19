@@ -1,3 +1,8 @@
+export const cameraConfig = {
+    frameRate: 30,
+    codec: "vp8",
+    bitrate: 2_000_000
+}
 
 export const captureConfig = {
     pattern: "01",
