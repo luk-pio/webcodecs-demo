@@ -5,9 +5,13 @@ export const cameraConfig = {
 }
 
 export const captureConfig = {
-    pattern: "01",
-    duration: 10 ** 3,
+    pattern: "00110011001100110011",
+    duration: secondsInMilliseconds(10),
     handlers: { '0': setBlackBackground, '1': setWhiteBackground }
+}
+
+function secondsInMilliseconds(seconds) {
+    return seconds * 1000
 }
 
 function setBlackBackground() {
