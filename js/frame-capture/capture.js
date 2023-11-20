@@ -2,6 +2,7 @@ import { getCameraDevice, CameraStream, displayVideoStream } from "../camera-str
 import { FrameCaptureWorker } from "./frame-capture.js"
 import { captureConfig } from "../config.js"
 import { displayFrames } from "../decoder.js"
+import { runFrameCapture } from "./run-capture.js"
 
 export async function capture() {
     // Initialize the correct camera stream
