@@ -1,0 +1,29 @@
+{
+  "name": "webcodecs-demo",
+  "version": "0.0.0",
+  "description": "A demo of the WebCodecs API",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luk-pio/webcodecs-demo.git"
+  },
+  "keywords": [
+    "webcodecs"
+  ],
+  "author": "Luke Piotrak",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luk-pio/webcodecs-demo/issues"
+  },
+  "homepage": "https://github.com/luk-pio/webcodecs-demo#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

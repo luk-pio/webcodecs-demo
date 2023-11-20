@@ -1,4 +1,4 @@
-import { capture } from "./capture.js";
+import { capture } from "./frame-capture/capture.js";
 import { displayError, unhandledRejectionHandler, errorHandler } from "./error.js";
 
 addEventListener("load", main);
