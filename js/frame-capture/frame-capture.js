@@ -11,15 +11,23 @@ export class FrameCaptureWorker {
         this.videoFrameStream = getFrameStream(this.trackProcessor)
         this.worker = new Worker('./js/frame-capture/worker.js');
         this.worker.onerror = errorHandler
+        this.worker.onmessageerror = errorHandler
     }
 
     async start() {
         await this.#initializeFrameCaptureWorker()
+        const { width, height } = this.cameraStream.videoStreamTrackSettings
+        const encoderConfig = {
+            codec: cameraConfig.codec,
+            width,
+            height,
+            bitrate: cameraConfig.bitrate,
+            framerate: cameraConfig.frameRate
+        }
         this.worker.postMessage({
             type: 'start',
             videoFrameStream: this.videoFrameStream,
-            videoStreamTrackSettings: this.cameraStream.videoStreamTrackSettings,
-            cameraConfig
+            encoderConfig
         }, [this.videoFrameStream]);
         await receiveWorkerMessage(this.worker, 'ready')
     }
